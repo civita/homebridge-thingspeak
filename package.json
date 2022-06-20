@@ -1,6 +1,6 @@
 {
   "name": "@civita/homebridge-thingspeak",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "forked from tamasharasztosi/homebridge-thingspeak",
   "main": "index.js",
   "scripts": {
