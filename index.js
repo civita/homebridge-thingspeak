@@ -91,7 +91,7 @@ Httpthingspeak.prototype = {
 					if(k.indexOf("field") > -1)
 						var value = parseFloat(JSON.parse(body)[k]);
 				}
-				this.temperatureService.setCharacteristic(
+				this.humidityService.setCharacteristic(
 					Characteristic.CurrentRelativeHumidity,
 					value
 				);
