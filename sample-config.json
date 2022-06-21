@@ -1,6 +1,6 @@
 {
     "bridge": {
-        "name": "@civita/homebridge-thingspeak",
+        "name": "homebridge-ts",
         "username": "CC:22:3D:E3:CE:34",
         "port": 51826,
         "pin": "031-45-154"

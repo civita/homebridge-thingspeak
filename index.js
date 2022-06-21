@@ -20,7 +20,7 @@ module.exports = function (homebridge) {
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
 	homebridge.registerAccessory(
-		"@civita/homebridge-thingspeak",  // PluginName
+		"homebridge-ts",  // PluginName
 		"Httpthingspeak",      // accessoryName
 		Httpthingspeak         // constructor
 	);
@@ -42,6 +42,7 @@ function Httpthingspeak(log, config) {
 	this.serial = config["serial"] || "Sample Serial";
 	this.temperatureService;
 	this.humidityService;
+	this.rotationSpeedService
 }
 
 Httpthingspeak.prototype = {
@@ -99,6 +100,27 @@ Httpthingspeak.prototype = {
 		}.bind(this));
 	},
 
+	getSensorRotationSpeedValue: function (callback) {
+		this.debug && this.log('getRotationSpeedValue');
+		this.httpRequest(this.url,this.http_method,function(error, response, body) {
+			if (error) {
+				this.log('HTTP get failed: %s', error.message);
+				callback(error);
+			} else {
+				this.debug && this.log('HTTP success. Got result ['+body+']');
+				for(const k in JSON.parse(body)) {
+					if(k.indexOf("field") > -1)
+						var value = parseFloat(JSON.parse(body)[k]);
+				}
+				this.rotationSpeedService.setCharacteristic(
+					Characteristic.RotationSpeed,
+					value
+				);	
+				callback(null, value);
+			}
+		}.bind(this));
+	},
+
 	identify: function (callback) {
 		this.log("Identify requested!");
 		callback(); // success
@@ -124,11 +146,20 @@ Httpthingspeak.prototype = {
 				services.push(this.temperatureService);
 				break;
 			case "CurrentRelativeHumidity":
-				this.temperatureService = new Service.HumiditySensor(this.name);
-				this.temperatureService
+				this.humidityService = new Service.HumiditySensor(this.name);
+				this.humidityService
 					.getCharacteristic(Characteristic.CurrentRelativeHumidity)
 					.on('get', this.getSensorHumidityValue.bind(this));
-				services.push(this.temperatureService);
+				services.push(this.humidityService);
+				break;
+			case "RotationSpeed":
+				this.rotationSpeedService = new Service.Fan(this.name);
+				this.rotationSpeedService
+					.getCharacteristic(Characteristic.RotationSpeed)
+					.on('get', this.getSensorRotationSpeedValue.bind(this));
+				this.rotationSpeedService
+					.setCharacteristic(Characteristic.On, 1);
+				services.push(this.rotationSpeedService);
 				break;
 			default:
 				this.log('Error: unknown type: '+this.type+'. skipping...');
