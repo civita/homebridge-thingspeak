@@ -1,6 +1,6 @@
 {
   "name": "homebridge-ts",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "civita",
   "description": "Forked from tamasharasztosi/homebridge-thingspeak",
   "license": "MIT",
